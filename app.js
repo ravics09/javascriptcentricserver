@@ -1,0 +1,27 @@
+const express = require('express');
+const app = express();
+
+const path = require('path');
+const cors = require('cors');
+
+// Use Middlewares in our app.
+app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.json());  
+app.use(express.urlencoded({ extended: true }))
+app.use(cors());
+
+// app.use((_, res, next) => {
+//     res.setHeader('Access-Control-Allow-Origin', '*');
+//     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH, DELETE');
+//     res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+//     next();
+// });
+
+//import routers
+// app.use('/user', require('./routers/userRouter'));
+
+//Create Express web server
+const port = process.env.NODE_ENV === 'production' ? process.env.PORT || 80 : 9090;
+app.listen(port, () => {
+    console.log('JavaScript Centric Server running on port ' + port);
+});
