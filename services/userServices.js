@@ -53,6 +53,7 @@ async function createUser(userDetails, response, next) {
 }
 
 async function getUser(userDetails, response, next) {
+  console.log("getUser called================================");
   // Find for email if user registered or not?
   User.findOne({ email: userDetails.email }).then((dbUser) => {
     if (!dbUser) {
@@ -75,6 +76,7 @@ async function getUser(userDetails, response, next) {
             const token = jwt.sign({ email: userDetails.email }, "secret", {
               expiresIn: "1h",
             });
+            console.log("User successfully signin");
             response
               .status(200)
               .json({ message: "User successfully signin", token: token });
