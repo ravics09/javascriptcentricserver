@@ -18,8 +18,12 @@ const userSchema = new Schema({
         type: String,
         required: true
     },
-});
-userSchema.set('toJSON', {
-    virtuals: true
+},{ timestamps: true });
+
+userSchema.set('toJSON', ()=>{
+    virtuals: true;
+    const { __v, _id, ...object } = this.toObject();
+    object.id = _id;
+    return object;
 });
 module.exports = mongoose.model('User', userSchema);
