@@ -30,7 +30,8 @@ async function createUser(userDetails, response, next) {
           })
             .then(() => {
               response.status(200).json({
-                message: "You have signUp successfully. Please signIn here !!",
+                message: "You have signed up successfully. Please sign in!!",
+                statusCode: 200,
               });
             })
             .catch((err) => {
@@ -53,7 +54,6 @@ async function createUser(userDetails, response, next) {
 }
 
 async function getUser(userDetails, response, next) {
-  console.log("getUser called================================");
   // Find for email if user registered or not?
   User.findOne({ email: userDetails.email }).then((dbUser) => {
     if (!dbUser) {
@@ -61,31 +61,30 @@ async function getUser(userDetails, response, next) {
     } else {
       // If User Registered then retrive user details and compare password.
       // password hash
-      bcrypt.compare(
-        userDetails.password,
-        dbUser.hash,
-        (err, compareRes) => {
-          if (err) {
-            // error while comparing
-            response
-              .status(502)
-              .json({ message: "Server error while checking user password" });
-          } else if (compareRes) {
-            // password match
-            const token = jwt.sign({ email: userDetails.email }, "secret", {
-              expiresIn: "1h",
-            });
-            response
-              .status(200)
-              .json({ message: "User successfully signin", token: token, user: dbUser });
-          } else {
-            // password doesnt match
-            response
-              .status(401)
-              .json({ message: "Invalid Credentials! Please try again." });
-          }
+      bcrypt.compare(userDetails.password, dbUser.hash, (err, compareRes) => {
+        if (err) {
+          // error while comparing
+          response
+            .status(502)
+            .json({ message: "Server error while checking user password" });
+        } else if (compareRes) {
+          // password match
+          const token = jwt.sign({ email: userDetails.email }, "secret", {
+            expiresIn: "1h",
+          });
+          response.status(200).json({
+            message: "You have successfully signed in",
+            token: token,
+            user: dbUser,
+            statusCode: 200,
+          });
+        } else {
+          // password doesnt match
+          response
+            .status(401)
+            .json({ message: "Invalid Credentials! Please try again." });
         }
-      );
+      });
     }
   });
 }
