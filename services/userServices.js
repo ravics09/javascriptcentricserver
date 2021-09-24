@@ -61,7 +61,6 @@ async function getUser(userDetails, response, next) {
     } else {
       // If User Registered then retrive user details and compare password.
       // password hash
-      console.log("dbUser=====", dbUser);
       bcrypt.compare(
         userDetails.password,
         dbUser.hash,
@@ -76,10 +75,9 @@ async function getUser(userDetails, response, next) {
             const token = jwt.sign({ email: userDetails.email }, "secret", {
               expiresIn: "1h",
             });
-            console.log("User successfully signin");
             response
               .status(200)
-              .json({ message: "User successfully signin", token: token });
+              .json({ message: "User successfully signin", token: token, user: dbUser });
           } else {
             // password doesnt match
             response
