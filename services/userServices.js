@@ -1,9 +1,10 @@
 const db = require("./../database/createConnection");
+const config = require("../database/databaseConfig");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const User = db.User;
 
-module.exports = { createUser, getUser };
+module.exports = { createUser, getUser, getProfile, editProfile };
 
 async function createUser(userDetails, response, next) {
   //Find for email if user already registered or not?
@@ -69,9 +70,13 @@ async function getUser(userDetails, response, next) {
             .json({ message: "Server error while checking user password" });
         } else if (compareRes) {
           // password match
-          const token = jwt.sign({ email: userDetails.email }, "secret", {
-            expiresIn: "1h",
-          });
+          const token = jwt.sign(
+            { email: userDetails.email },
+            config.secretKey,
+            {
+              expiresIn: config.expiresIn,
+            }
+          );
           response.status(200).json({
             message: "You have successfully signed in",
             token: token,
@@ -87,4 +92,48 @@ async function getUser(userDetails, response, next) {
       });
     }
   });
+}
+
+async function getProfile(request, response, next) {
+  User.findOne({ _id: request.params.id })
+    .then((dbUser) => {
+      response.status(200).json({
+        user: dbUser,
+        statusCode: 200,
+      });
+    })
+    .catch((error) => {
+      response.status(401).json({
+        error: error,
+      });
+    });
+}
+
+async function editProfile(request, response, next) {
+  const updatedInfo = new User({
+    _id: request.params.id,
+    fullName: request.body.fullName,
+    email: request.body.email,
+    username: request.body.username,
+    mobile: request.body.mobile,
+    location: request.body.location,
+    bio: request.body.bio,
+    skills: request.body.skills,
+    work: request.body.work,
+    education: request.body.education,
+  });
+
+  User.findByIdAndUpdate(request.params.id, updatedInfo)
+    .then((dbUser) => {
+      response.status(200).json({
+        message: "Profile updated successfully!",
+        user: dbUser,
+        statusCode: 200,
+      });
+    })
+    .catch((error) => {
+      response.status(401).json({
+        error: error,
+      });
+    });
 }
