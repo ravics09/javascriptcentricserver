@@ -3,6 +3,7 @@ const config = require("../database/databaseConfig");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const User = db.User;
+let multer = require("multer");
 
 module.exports = { createUser, getUser, getProfile, editProfile };
 
@@ -114,14 +115,26 @@ async function editProfile(request, response, next) {
     _id: request.params.id,
     fullName: request.body.fullName,
     email: request.body.email,
-    username: request.body.username,
+    userName: request.body.userName,
     mobile: request.body.mobile,
     location: request.body.location,
     bio: request.body.bio,
     skills: request.body.skills,
     work: request.body.work,
     education: request.body.education,
+    profileImage: request.body.profileImage,
   });
+
+  // let storage = multer.diskStorage({
+  //   destination: (req, file, cb) => {
+  //     cb(null, "public");
+  //   },
+  //   filename: (req, file, cb) => {
+  //     cb(null, file.fieldname + "-" + Date.now());
+  //   },
+  // });
+
+  // let upload = multer({ storage: storage }).single('file');
 
   User.findByIdAndUpdate(request.params.id, updatedInfo)
     .then((dbUser) => {

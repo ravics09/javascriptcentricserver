@@ -13,6 +13,7 @@ app.use(cors());
 
 // import routers
 app.use('/user', require('./routers/userRouter'));
+app.use('/feed', require('./routers/feedRouter'));
 
 //Create Express web server
 const port = process.env.NODE_ENV === 'production' ? process.env.PORT || 80 : 9090;

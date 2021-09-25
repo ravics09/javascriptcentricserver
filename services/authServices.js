@@ -1,5 +1,6 @@
 const config = require("../database/databaseConfig");
 const jwt = require("jsonwebtoken");
+// require('dotenv/config');
 
 const isAuth = (request, response, next) => {
   const authHeader = request.get("Authorization");
