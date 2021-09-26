@@ -2,7 +2,7 @@ const db = require("./../database/createConnection");
 const config = require("../database/databaseConfig");
 const Feed = db.Feed;
 
-module.exports = { createPost, getPost, getPosts };
+module.exports = { createPost, getPost, getPosts, editPost };
 
 async function createPost(request, response, next) {
   
@@ -52,20 +52,24 @@ async function getPosts(request, response, next) {
   });
 }
 
-// async function editPost(request, response, next) {
+async function editPost(request, response, next) {
+  const updatedInfo = new Feed({
+    _id: request.params.id,
+    postTitle: request.body.postTitle,
+    postContent: request.body.postContent
+  })
 
-
-//   // User.findByIdAndUpdate(request.params.id, updatedInfo)
-//   //   .then((dbUser) => {
-//   //     response.status(200).json({
-//   //       message: "Profile updated successfully!",
-//   //       user: dbUser,
-//   //       statusCode: 200,
-//   //     });
-//   //   })
-//   //   .catch((error) => {
-//   //     response.status(401).json({
-//   //       error: error,
-//   //     });
-//   //   });
-// }
+  User.findByIdAndUpdate({ _id: request.params.id}, updatedInfo)
+    .then((res) => {
+      response.status(200).json({
+        message: "Your Post Updated Successfully!",
+        user: res,
+        statusCode: 200,
+      });
+    })
+    .catch((error) => {
+      response.status(401).json({
+        error: error,
+      });
+    });
+}

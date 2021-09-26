@@ -6,7 +6,7 @@ const { isAuth } = require('./../services/authServices');
 mainRoutes.post('/createpost', createPost);
 mainRoutes.get('/getpost/:id', getPost);
 mainRoutes.get('/getposts', getPosts);
-// mainRoutes.put('/editpost/:id', editPost);
+mainRoutes.put('/editpost/:id', editPost);
 
 function createPost(request, response, next) {
     feedService.createPost(request, response, next);
@@ -20,9 +20,9 @@ function getPosts(request, response, next) {
     feedService.getPosts(request, response, next);
 };
 
-// function editPost(request, response, next) {
-//     feedService.editPost(request, response, next);
-// };
+function editPost(request, response, next) {
+    feedService.editPost(request, response, next);
+};
 
 
 module.exports = mainRoutes;
