@@ -8,6 +8,7 @@ let multer = require("multer");
 module.exports = { createUser, getUser, getProfile, editProfile };
 
 async function createUser(userDetails, response, next) {
+  console.log("createUser called==",userDetails);
   //Find for email if user already registered or not?
   User.findOne({
     email: userDetails.email,
@@ -82,6 +83,7 @@ async function getUser(userDetails, response, next) {
             message: "You have successfully signed in",
             token: token,
             user: dbUser,
+            userId: (dbUser._id).toString(),
             statusCode: 200,
           });
         } else {
