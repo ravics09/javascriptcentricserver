@@ -1,8 +1,12 @@
 const db = require("./../database/createConnection");
 const config = require("../database/databaseConfig");
 const bcrypt = require("bcryptjs");
+const crypto = require("crypto");
+// var AES = require("crypto-js/aes");
 const jwt = require("jsonwebtoken");
 const User = db.User;
+const Token = db.Token;
+const BaseURL = "http://localhost:3000";
 require("dotenv").config();
 // let multer = require("multer");
 let nodemailer = require("nodemailer");
@@ -13,6 +17,7 @@ module.exports = {
   getProfile,
   editProfile,
   forgetPassword,
+  validateResetLink
 };
 
 async function createUser(userDetails, response, next) {
@@ -169,45 +174,74 @@ async function forgetPassword(request, response, next) {
       statusCode: 400,
     });
   }
+  const user  = await User.findOne({email: request.body.email});
+  if(!user) return reponse.status(403).send("This Email not registered with us")
 
-  User.findOne({
-    email: request.body.email,
-  }).then((user) => {
-    if (user===null) {
-      response.status(403).send({
-        message: "This Email not registered with us",
-        statusCode: 403
-      });
+  let token = await Token.findOne({userId: user._id});
+  if(!token){
+    token = await new Token({
+      userId: user._id,
+      token: crypto.randomBytes(20).toString("hex")
+    }).save();
+  }
+
+  const resetLink = `${BaseURL}/resetpassword/${user._id}/${token.token}`;
+
+  const transporter = nodemailer.createTransport({
+    service: "gmail",
+    secure: true,
+    port: 587,
+    auth: {
+      user: `${process.env.EMAIL_ADDRESS}`,
+      pass: `${process.env.EMAIL_PASSWORD}`,
+    },
+  });
+
+  const mailOptions = {
+    from: "ravisharmacs09@gmail.com",
+    to: `${user.email}`,
+    subject: "Link To Reset Password",
+    text:
+      `You are receiving this because you (or someone else) have requested the reset of the password for your account.\n\n` +
+      `Please lick on the following link, or paste this into your browser to complete the process within one hour of receiving it:\n\n` +
+      `${resetLink}` +
+      `\n\n` +
+      `If you did not request this, please ignore this email and your password will remain unchanged.\n`,
+  };
+
+  transporter.sendMail(mailOptions, (error, res) => {
+    if (error) {
+      console.log("There was an error: ", error);
     } else {
-      const transporter = nodemailer.createTransport({
-        service: "gmail",
-        auth: {
-          user: `${process.env.EMAIL_ADDRESS}`,
-          pass: `${process.env.EMAIL_PASSWORD}`,
-        },
-      });
-
-      const mailOptions = {
-        from: "ravisharmacs09@gmail.com",
-        to: `${user.email}`,
-        subject: "Link To Reset Password",
-        text:
-          `You are receiving this because you (or someone else) have requested the reset of the password for your account.\n\n` +
-          `Please lick on the following link, or paste this into your browser to complete the process within one hour of receiving it:\n\n` +
-          `https://localhost:3000/resetpassword` +`\n\n`+
-          `If you did not request this, please ignore this email and your password will remain unchanged.\n`,
-      };
-
-      transporter.sendMail(mailOptions, (error, res) => {
-        if (error) {
-          console.log("There was an error: ", error);
-        } else {
-          response.status(200).json({
-            message: `Recovery email link sent on ${user.email}`,
-            statusCode: 200,
-          });
-        }
+      response.status(200).json({
+        message: `Recovery email link sent on ${user.email}`,
+        statusCode: 200,
       });
     }
   });
+}
+
+// async function resetPassword(request, response, next) {
+//   const user  = await User.findOne({ email: request.body.email });
+//   if(!user) return response.status(400).send("User With given email address doesn't exist.");
+ 
+// }
+
+async function validateResetLink(request, response, next) {
+  console.log("validateResetLink request",request);
+
+  const user = await User.findById(request.params.id);
+  if(!user) response.status(400).send("User Not Found");
+
+  const token = await Token.findOne({
+    userId: user._id,
+    token: request.params.token
+  });
+
+  if(!token) response.status(400).send("Invalid Link Or Link Expired");
+
+  await user.save();
+  await token.delete();
+
+  response.status(200).send("Reset Link Is-Ok");
 }
