@@ -7,8 +7,8 @@ mainRoutes.post('/signup', signUp);
 mainRoutes.post('/signin', signIn);
 mainRoutes.get('/profile/:id', isAuth, getProfile);
 mainRoutes.put('/editprofile/:id', isAuth, editProfile);
+mainRoutes.post('/forgetpassword', forgetPassword);
 
-// mainRoutes.get('/authenticate', isAuthenticate);
 mainRoutes.use('/', (request, response, next)=> {
     response.status(404).json({error:"Page Not Found"});
 });
@@ -27,6 +27,10 @@ function getProfile(request, response, next) {
 
 function editProfile(request, response, next) {
     userServices.editProfile(request, response, next);
+};
+
+function forgetPassword(request, response, next) {
+    userServices.forgetPassword(request, response, next);
 };
 
 
