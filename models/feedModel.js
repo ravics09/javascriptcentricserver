@@ -33,10 +33,7 @@ const feedSchema = new Schema(
   { timestamps: true }
 );
 
-feedSchema.set("toJSON", () => {
-  virtuals: true;
-  const { __v, _id, ...object } = this.toObject();
-  object.id = _id;
-  return object;
+feedSchema.set("toJSON", {
+  virtuals: true
 });
 module.exports = mongoose.model("Feed", feedSchema);

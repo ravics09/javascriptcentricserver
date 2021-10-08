@@ -18,4 +18,8 @@ const tokenSchema = new Schema({
     },
 });
 
+tokenSchema.set("toJSON", {
+    virtuals: true
+  });
+
 module.exports = mongoose.model("token", tokenSchema);

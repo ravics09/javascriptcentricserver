@@ -1,5 +1,4 @@
 const mongoose = require("mongoose");
-
 const Schema = mongoose.Schema;
 
 const userSchema = new Schema(
@@ -65,10 +64,7 @@ const userSchema = new Schema(
   { timestamps: true }
 );
 
-userSchema.set("toJSON", () => {
-  virtuals: true;
-  const { __v, _id, ...object } = this.toObject();
-  object.id = _id;
-  return object;
+userSchema.set("toJSON", {
+  virtuals: true
 });
 module.exports = mongoose.model("User", userSchema);
