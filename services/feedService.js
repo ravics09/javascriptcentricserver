@@ -1,5 +1,4 @@
 const db = require("./../database/createConnection");
-const config = require("../database/databaseConfig");
 const Feed = db.Feed;
 
 module.exports = { createPost, getPost, getPosts, editPost };

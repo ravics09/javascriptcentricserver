@@ -1,19 +1,18 @@
-const config = require("../database/databaseConfig");
+require('dotenv/config');
 const jwt = require("jsonwebtoken");
-// require('dotenv/config');
 
 const isAuth = (request, response, next) => {
   const authHeader = request.get("Authorization");
 
   if (!authHeader) {
-    return response.status(401).json({ error: "Not Authenticated" });
+    response.status(401).send("Not Authenticated");
   }
 
   const token = authHeader.split(" ")[1];
   let decodedToken;
 
   try {
-    decodedToken = jwt.verify(token, config.secretKey);
+    decodedToken = jwt.verify(token, process.env.SECRET_KEY);
   } catch (err) {
     return response
       .status(500)
@@ -21,10 +20,9 @@ const isAuth = (request, response, next) => {
   }
 
   if (!decodedToken) {
-    return response.status(401).json({ message: "Unauthorized Access" });
-  } else {
-    next();
+    response.status(401).send("Unauthorized Access");
   }
+  next();
 };
 
 module.exports = { isAuth };

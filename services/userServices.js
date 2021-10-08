@@ -5,7 +5,6 @@ const crypto = require("crypto");
 const jwt = require("jsonwebtoken");
 
 const db = require("./../database/createConnection");
-const config = require("../database/databaseConfig");
 
 const BaseURL = "http://localhost:3000";
 
@@ -99,8 +98,8 @@ async function getUser(request, response, next) {
       if (err) {
         response.status(502).send("Server error while checking user password");
       } else if (compareRes) {
-        const token = jwt.sign({ email: request.email }, config.secretKey, {
-          expiresIn: config.expiresIn,
+        const token = jwt.sign({ email: request.email }, process.env.SECRET_KEY, {
+          expiresIn: process.env.EXPIRE_IN
         });
 
         response.status(200).json({

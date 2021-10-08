@@ -1,11 +1,10 @@
-const config = require('./databaseConfig');
 const mongoose = require('mongoose');
 
-mongoose.connect(process.env.MONGODB_URI || config.databaseUrl);
+mongoose.connect(process.env.MONGODB_URI);
 mongoose.Promise = global.Promise;
 
 mongoose.connection.on('connected', () => {
-    console.log("Connected to database " + config.databaseUrl);
+    console.log("Connected to database " + process.env.MONGODB_URI);
 });
 mongoose.connection.on('error', err => {
     console.log("Database connection error " + err);

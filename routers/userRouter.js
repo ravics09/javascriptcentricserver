@@ -9,7 +9,7 @@ mainRoutes.get('/profile/:id', isAuth, getProfile);
 mainRoutes.put('/editprofile/:id', isAuth, editProfile);
 mainRoutes.post('/forgetpassword', forgetPassword);
 mainRoutes.get('/validateresetlink/:id/:token', validateResetLink); // Validate Reset Password Link Sent On Email Address
-mainRoutes.put('/resetpassword/:id', resetPassword);
+mainRoutes.put('/resetpassword/:id', resetPassword);  // Is it secured or not?
 
 mainRoutes.use('/', (request, response, next)=> {
     response.status(404).json({error:"Page Not Found"});

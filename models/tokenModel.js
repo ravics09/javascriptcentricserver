@@ -1,25 +1,28 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
-const tokenSchema = new Schema({
+const tokenSchema = new Schema(
+  {
     userId: {
-        type: Schema.Types.ObjectId,
-        required: true,
-        ref: "user",
+      type: Schema.Types.ObjectId,
+      required: true,
+      ref: "user",
     },
     token: {
-        type: String,
-        required: true,
+      type: String,
+      required: true,
     },
     createdAt: {
-        type: Date,
-        default: Date.now,
-        expires: 3600,
+      type: Date,
+      default: Date.now,
+      expires: 3600,
     },
-});
+  },
+  { timestamps: true }
+);
 
 tokenSchema.set("toJSON", {
-    virtuals: true
-  });
+  virtuals: true,
+});
 
 module.exports = mongoose.model("token", tokenSchema);
