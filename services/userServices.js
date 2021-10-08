@@ -44,51 +44,6 @@ async function createUser(request, response, next) {
     } else response.status(400).send("Please Enter Required Details");
   } else
     response.status(409).send("User already registered, Please Sign In...");
-
-  // User.findOne({
-  //   email: userDetails.email,
-  // }).then((dbUser) => {
-  //   if (dbUser) {
-  //     return response.status(409).json({
-  //       message:
-  //         "User with this email address already registered, Please signIn...",
-  //     });
-  //     //If user not registered then create new user entry in database.
-  //   } else if (userDetails.email && userDetails.password) {
-  //     bcrypt.hash(userDetails.password, 12, (err, passwordHash) => {
-  //       if (err) {
-  //         return response
-  //           .status(500)
-  //           .json({ message: "couldn't hash the password" });
-  //       } else if (passwordHash) {
-  //         return User.create({
-  //           email: userDetails.email,
-  //           fullName: userDetails.fullName,
-  //           hash: passwordHash,
-  //         })
-  //           .then(() => {
-  //             response.status(200).json({
-  //               message: "You have signed up successfully. Please sign in!!",
-  //               statusCode: 200,
-  //             });
-  //           })
-  //           .catch((err) => {
-  //             console.log(err);
-  //             next(err);
-  //             response
-  //               .status(502)
-  //               .json({ message: "Server error while signUp" });
-  //           });
-  //       }
-  //     });
-  //   } else if (!userDetails.password) {
-  //     return response.status(400).json({ message: "Please Enter Password" });
-  //   } else if (!userDetails.email) {
-  //     return response
-  //       .status(400)
-  //       .json({ message: "Please Enter Email Address" });
-  //   }
-  // });
 }
 
 async function getUser(request, response, next) {
@@ -98,9 +53,13 @@ async function getUser(request, response, next) {
       if (err) {
         response.status(502).send("Server error while checking user password");
       } else if (compareRes) {
-        const token = jwt.sign({ email: request.email }, process.env.SECRET_KEY, {
-          expiresIn: process.env.EXPIRE_IN
-        });
+        const token = jwt.sign(
+          { email: request.email },
+          process.env.SECRET_KEY,
+          {
+            expiresIn: process.env.EXPIRE_IN,
+          }
+        );
 
         response.status(200).json({
           message: "You have successfully signed in",

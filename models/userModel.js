@@ -13,6 +13,7 @@ const userSchema = new Schema(
       unique: true,
       required: true,
       trim: true,
+      index: true,
     },
     userName: {
       type: String,
@@ -65,6 +66,6 @@ const userSchema = new Schema(
 );
 
 userSchema.set("toJSON", {
-  virtuals: true
+  virtuals: true,
 });
 module.exports = mongoose.model("User", userSchema);
