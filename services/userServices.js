@@ -1,15 +1,16 @@
-const db = require("./../database/createConnection");
-const config = require("../database/databaseConfig");
+require("dotenv").config();
+const nodemailer = require("nodemailer");
 const bcrypt = require("bcryptjs");
 const crypto = require("crypto");
-// var AES = require("crypto-js/aes");
 const jwt = require("jsonwebtoken");
+
+const db = require("./../database/createConnection");
+const config = require("../database/databaseConfig");
+
+const BaseURL = "http://localhost:3000";
+
 const User = db.User;
 const Token = db.Token;
-const BaseURL = "http://localhost:3000";
-require("dotenv").config();
-// let multer = require("multer");
-let nodemailer = require("nodemailer");
 
 module.exports = {
   createUser,
@@ -17,231 +18,227 @@ module.exports = {
   getProfile,
   editProfile,
   forgetPassword,
-  validateResetLink
+  validateResetLink,
+  resetPassword,
 };
 
-async function createUser(userDetails, response, next) {
-  console.log("createUser called==", userDetails);
-  //Find for email if user already registered or not?
-  User.findOne({
-    email: userDetails.email,
-  }).then((dbUser) => {
-    if (dbUser) {
-      return response.status(409).json({
-        message:
-          "User with this email address already registered, Please signIn...",
-      });
-      //If user not registered then create new user entry in database.
-    } else if (userDetails.email && userDetails.password) {
-      bcrypt.hash(userDetails.password, 12, (err, passwordHash) => {
+async function createUser(request, response, next) {
+  const user = await User.findOne({ email: request.email });
+  if (!user) {
+    if (request.email && request.password) {
+      bcrypt.hash(request.password, 12, (err, passwordHash) => {
         if (err) {
-          return response
-            .status(500)
-            .json({ message: "couldn't hash the password" });
+          response.status(500).send("Couldn't hash the password");
         } else if (passwordHash) {
           return User.create({
-            email: userDetails.email,
-            fullName: userDetails.fullName,
+            email: request.email,
+            fullName: request.fullName,
             hash: passwordHash,
-          })
-            .then(() => {
-              response.status(200).json({
-                message: "You have signed up successfully. Please sign in!!",
-                statusCode: 200,
-              });
-            })
-            .catch((err) => {
-              console.log(err);
-              next(err);
-              response
-                .status(502)
-                .json({ message: "Server error while signUp" });
+          }).then(() => {
+            response.status(200).json({
+              message: "You have signed up successfully. Please sign in!!",
+              statusCode: 200,
             });
+          });
         }
       });
-    } else if (!userDetails.password) {
-      return response.status(400).json({ message: "Please Enter Password" });
-    } else if (!userDetails.email) {
-      return response
-        .status(400)
-        .json({ message: "Please Enter Email Address" });
-    }
-  });
+    } else response.status(400).send("Please Enter Required Details");
+  } else
+    response.status(409).send("User already registered, Please Sign In...");
+
+  // User.findOne({
+  //   email: userDetails.email,
+  // }).then((dbUser) => {
+  //   if (dbUser) {
+  //     return response.status(409).json({
+  //       message:
+  //         "User with this email address already registered, Please signIn...",
+  //     });
+  //     //If user not registered then create new user entry in database.
+  //   } else if (userDetails.email && userDetails.password) {
+  //     bcrypt.hash(userDetails.password, 12, (err, passwordHash) => {
+  //       if (err) {
+  //         return response
+  //           .status(500)
+  //           .json({ message: "couldn't hash the password" });
+  //       } else if (passwordHash) {
+  //         return User.create({
+  //           email: userDetails.email,
+  //           fullName: userDetails.fullName,
+  //           hash: passwordHash,
+  //         })
+  //           .then(() => {
+  //             response.status(200).json({
+  //               message: "You have signed up successfully. Please sign in!!",
+  //               statusCode: 200,
+  //             });
+  //           })
+  //           .catch((err) => {
+  //             console.log(err);
+  //             next(err);
+  //             response
+  //               .status(502)
+  //               .json({ message: "Server error while signUp" });
+  //           });
+  //       }
+  //     });
+  //   } else if (!userDetails.password) {
+  //     return response.status(400).json({ message: "Please Enter Password" });
+  //   } else if (!userDetails.email) {
+  //     return response
+  //       .status(400)
+  //       .json({ message: "Please Enter Email Address" });
+  //   }
+  // });
 }
 
-async function getUser(userDetails, response, next) {
-  // Find for email if user registered or not?
-  User.findOne({ email: userDetails.email }).then((dbUser) => {
-    if (!dbUser) {
-      return response.status(404).json({ message: "User Not Registered." });
-    } else {
-      // If User Registered then retrive user details and compare password.
-      // password hash
-      bcrypt.compare(userDetails.password, dbUser.hash, (err, compareRes) => {
-        if (err) {
-          // error while comparing
-          response
-            .status(502)
-            .json({ message: "Server error while checking user password" });
-        } else if (compareRes) {
-          // password match
-          const token = jwt.sign(
-            { email: userDetails.email },
-            config.secretKey,
-            {
-              expiresIn: config.expiresIn,
-            }
-          );
-          console.log("Successfully login");
-          response.status(200).json({
-            message: "You have successfully signed in",
-            token: token,
-            user: dbUser,
-            userId: dbUser._id.toString(),
-            statusCode: 200,
-          });
-        } else {
-          // password doesnt match
-          response
-            .status(401)
-            .json({ message: "Invalid Credentials! Please try again." });
-        }
-      });
-    }
-  });
+async function getUser(request, response, next) {
+  const user = await User.findOne({ email: request.email });
+  if (user) {
+    bcrypt.compare(request.password, user.hash, (err, compareRes) => {
+      if (err) {
+        response.status(502).send("Server error while checking user password");
+      } else if (compareRes) {
+        const token = jwt.sign({ email: request.email }, config.secretKey, {
+          expiresIn: config.expiresIn,
+        });
+
+        response.status(200).json({
+          message: "You have successfully signed in",
+          token: token,
+          user: user,
+          userId: user._id.toString(),
+          statusCode: 200,
+        });
+      } else {
+        response.status(401).send("Invalid Credentials! Please try again.");
+      }
+    });
+  } else response.status(404).send("User Not Registered.");
 }
 
 async function getProfile(request, response, next) {
-  User.findOne({ _id: request.params.id })
-    .then((dbUser) => {
-      response.status(200).json({
-        user: dbUser,
-        statusCode: 200,
-      });
-    })
-    .catch((error) => {
-      response.status(401).json({
-        error: error,
-      });
+  const user = User.findById(request.params.id);
+  if (user) {
+    response.status(200).json({
+      user: dbUser,
+      statusCode: 200,
     });
+  } else response.status(400).send("User Information Not Found");
 }
 
 async function editProfile(request, response, next) {
-  const updatedInfo = new User({
-    _id: request.params.id,
-    fullName: request.body.fullName,
-    email: request.body.email,
-    userName: request.body.userName,
-    mobile: request.body.mobile,
-    location: request.body.location,
-    bio: request.body.bio,
-    skills: request.body.skills,
-    work: request.body.work,
-    education: request.body.education,
-    profileImage: request.body.profileImage,
-  });
+  const user = User.findById(request.params.id);
+  if (user) {
+    const updatedInfo = new User({
+      _id: request.params.id,
+      fullName: request.body.fullName,
+      email: request.body.email,
+      userName: request.body.userName,
+      mobile: request.body.mobile,
+      location: request.body.location,
+      bio: request.body.bio,
+      skills: request.body.skills,
+      work: request.body.work,
+      education: request.body.education,
+      profileImage: request.body.profileImage,
+    });
 
-  // let storage = multer.diskStorage({
-  //   destination: (req, file, cb) => {
-  //     cb(null, "public");
-  //   },
-  //   filename: (req, file, cb) => {
-  //     cb(null, file.fieldname + "-" + Date.now());
-  //   },
-  // });
-
-  // let upload = multer({ storage: storage }).single('file');
-
-  User.findByIdAndUpdate(request.params.id, updatedInfo)
-    .then((dbUser) => {
+    User.findByIdAndUpdate(request.params.id, updatedInfo).then((dbUser) => {
       response.status(200).json({
         message: "Profile updated successfully!",
         user: dbUser,
         statusCode: 200,
       });
-    })
-    .catch((error) => {
-      response.status(401).json({
-        error: error,
-      });
     });
+  } else response.status(404).send("User Information Not Found.");
 }
 
 async function forgetPassword(request, response, next) {
   if (request.body.email === "") {
-    response.status(400).json({
-      message: "Email Address Required..",
-      statusCode: 400,
-    });
+    response.status(400).send("Email Address Required..");
   }
-  const user  = await User.findOne({email: request.body.email});
-  if(!user) return reponse.status(403).send("This Email not registered with us")
+  const user = await User.findOne({ email: request.body.email });
+  if (user) {
+    let token = await Token.findOne({ userId: user._id });
+    if (!token) {
+      token = await new Token({
+        userId: user._id,
+        token: crypto.randomBytes(20).toString("hex"),
+      }).save();
 
-  let token = await Token.findOne({userId: user._id});
-  if(!token){
-    token = await new Token({
-      userId: user._id,
-      token: crypto.randomBytes(20).toString("hex")
-    }).save();
-  }
+      const resetLink = `${BaseURL}/resetpassword/${user._id}/${token.token}`;
 
-  const resetLink = `${BaseURL}/resetpassword/${user._id}/${token.token}`;
+      const transporter = nodemailer.createTransport({
+        service: "gmail",
+        secure: true,
+        port: 587,
+        auth: {
+          user: `${process.env.EMAIL_ADDRESS}`,
+          pass: `${process.env.EMAIL_PASSWORD}`,
+        },
+      });
 
-  const transporter = nodemailer.createTransport({
-    service: "gmail",
-    secure: true,
-    port: 587,
-    auth: {
-      user: `${process.env.EMAIL_ADDRESS}`,
-      pass: `${process.env.EMAIL_PASSWORD}`,
-    },
-  });
+      const mailOptions = {
+        from: "ravisharmacs09@gmail.com",
+        to: `${user.email}`,
+        subject: "Link To Reset Password",
+        text:
+          `You are receiving this because you (or someone else) have requested the reset of the password for your account.\n\n` +
+          `Please lick on the following link, or paste this into your browser to complete the process within one hour of receiving it:\n\n` +
+          `${resetLink}` +
+          `\n\n` +
+          `If you did not request this, please ignore this email and your password will remain unchanged.\n`,
+      };
 
-  const mailOptions = {
-    from: "ravisharmacs09@gmail.com",
-    to: `${user.email}`,
-    subject: "Link To Reset Password",
-    text:
-      `You are receiving this because you (or someone else) have requested the reset of the password for your account.\n\n` +
-      `Please lick on the following link, or paste this into your browser to complete the process within one hour of receiving it:\n\n` +
-      `${resetLink}` +
-      `\n\n` +
-      `If you did not request this, please ignore this email and your password will remain unchanged.\n`,
-  };
-
-  transporter.sendMail(mailOptions, (error, res) => {
-    if (error) {
-      console.log("There was an error: ", error);
-    } else {
-      response.status(200).json({
-        message: `Recovery email link sent on ${user.email}`,
-        statusCode: 200,
+      transporter.sendMail(mailOptions, (error, res) => {
+        if (error) {
+          response.status(500).send("Error While Sending Password Reset Link");
+        } else {
+          response.status(200).json({
+            message: `Recovery email link sent on ${user.email}`,
+            statusCode: 200,
+          });
+        }
       });
     }
-  });
+  } else reponse.status(403).send("User Not Found For This Email Address");
 }
 
-// async function resetPassword(request, response, next) {
-//   const user  = await User.findOne({ email: request.body.email });
-//   if(!user) return response.status(400).send("User With given email address doesn't exist.");
- 
-// }
+async function resetPassword(request, response, next) {
+  const user = await User.findById(request.params.id);
+  if (user) {
+    if (request.body.password) {
+      bcrypt.hash(request.body.password, 12, (err, passwordHash) => {
+        if (err) {
+          return response
+            .status(500)
+            .json({ message: "couldn't hash the password" });
+        } else if (passwordHash) {
+          user.hash = passwordHash;
+          user.save();
+          response.status(200).json({
+            message: "Password Updated successfully from backend.",
+            statusCode: 200,
+          });
+        }
+      });
+    }
+  } else return response.status(400).send("User doesn't exist.");
+}
 
 async function validateResetLink(request, response, next) {
-  console.log("validateResetLink request",request);
-
   const user = await User.findById(request.params.id);
-  if(!user) response.status(400).send("User Not Found");
+  if (user) {
+    const token = await Token.findOne({
+      userId: user._id,
+      token: request.params.token,
+    });
 
-  const token = await Token.findOne({
-    userId: user._id,
-    token: request.params.token
-  });
-
-  if(!token) response.status(400).send("Invalid Link Or Link Expired");
-
-  await user.save();
-  await token.delete();
-
-  response.status(200).send("Reset Link Is-Ok");
+    if (token) {
+      await user.save();
+      await token.delete();
+      response.status(200).send("Reset Link Is-Ok");
+    } else response.status(400).send("Invalid Link Or Link Expired");
+  } else response.status(404).send("User Not Found");
 }

@@ -8,8 +8,8 @@ mainRoutes.post('/signin', signIn);
 mainRoutes.get('/profile/:id', isAuth, getProfile);
 mainRoutes.put('/editprofile/:id', isAuth, editProfile);
 mainRoutes.post('/forgetpassword', forgetPassword);
-mainRoutes.get('/validateresetlink/:id/:token', validateResetLink); // Reset Password through link sent on email address
-// mainRoutes.post('/resetpassword/:id/:token', resetPassword); // Reset Password By User themself.
+mainRoutes.get('/validateresetlink/:id/:token', validateResetLink); // Validate Reset Password Link Sent On Email Address
+mainRoutes.put('/resetpassword/:id', resetPassword);
 
 mainRoutes.use('/', (request, response, next)=> {
     response.status(404).json({error:"Page Not Found"});
@@ -39,9 +39,8 @@ function validateResetLink(request, response, next) {
     userServices.validateResetLink(request, response, next);
 };
 
-// function resetPassword(request, response, next) {
-//     userServices.resetPassword(request, response, next);
-// };
-
+function resetPassword(request, response, next) {
+    userServices.resetPassword(request, response, next);
+};
 
 module.exports = mainRoutes;
