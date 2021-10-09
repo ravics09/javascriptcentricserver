@@ -3,7 +3,7 @@ const mainRoutes = express.Router();
 const feedService = require('./../services/feedService');
 const { isAuth } = require('./../services/authServices');
 
-mainRoutes.post('/createpost', isAuth, createPost);
+mainRoutes.post('/createpost', createPost);
 mainRoutes.get('/getpost/:id', getPost);
 mainRoutes.get('/getposts', getPosts);
 mainRoutes.put('/editpost/:id', isAuth, editPost);

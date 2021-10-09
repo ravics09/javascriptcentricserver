@@ -4,12 +4,12 @@ const Feed = db.Feed;
 module.exports = { createPost, getPost, getPosts, editPost };
 
 async function createPost(request, response, next) {
-  
+  console.log("request body", request.body);
   const feed = new Feed({
     userId: request.body.userId,
-    fullName: request.body.fullName,
+    fullName: request.body.userName,
     postTitle: request.body.postTitle,
-    postContent: request.body.postContent,
+    postContent: request.body.postContent
   });
   feed.save().then(() => {
     response.status(200).json({
@@ -20,7 +20,6 @@ async function createPost(request, response, next) {
 }
 
 async function getPost(request, response, next) {
-  console.log("createPost called with request", request);
   
   Feed.findById({ _id: request.params.id })
     .then((res) => {
@@ -45,9 +44,7 @@ async function getPosts(request, response, next) {
     });
   })
   .catch((error) => {
-    response.status(401).json({
-      error: error,
-    });
+    response.status(401).send(error);
   });
 }
 

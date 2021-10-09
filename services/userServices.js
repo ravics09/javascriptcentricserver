@@ -76,10 +76,11 @@ async function getUser(request, response, next) {
 }
 
 async function getProfile(request, response, next) {
-  const user = User.findById(request.params.id);
+  const user = await User.findById(request.params.id);
   if (user) {
+    console.log("user passing",user);
     response.status(200).json({
-      user: dbUser,
+      user: user,
       statusCode: 200,
     });
   } else response.status(400).send("User Information Not Found");
@@ -160,7 +161,7 @@ async function forgetPassword(request, response, next) {
         }
       });
     }
-  } else reponse.status(403).send("User Not Found For This Email Address");
+  } else response.status(403).send("User Not Found For This Email Address");
 }
 
 async function resetPassword(request, response, next) {
