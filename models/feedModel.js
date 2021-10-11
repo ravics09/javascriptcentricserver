@@ -3,16 +3,9 @@ const Schema = mongoose.Schema;
 
 const feedSchema = new Schema(
   {
-    userId: {
-      type: String,
-      required: true,
-      trim: true,
-      index: true,
-    },
-    fullName: {
-      type: String,
-      required: true,
-      trim: true,
+    postedBy: {
+      type: Schema.Types.ObjectId,
+      ref: "User",
     },
     postTitle: {
       type: String,
@@ -30,11 +23,17 @@ const feedSchema = new Schema(
       data: Buffer,
       contentType: String,
     },
+    comments: [
+      {
+        text: String,
+        postedBy: {
+          type: Schema.Types.ObjectId,
+          ref: "User",
+        },
+      },
+    ],
   },
   { timestamps: true }
 );
 
-feedSchema.set("toJSON", {
-  virtuals: true
-});
 module.exports = mongoose.model("Feed", feedSchema);

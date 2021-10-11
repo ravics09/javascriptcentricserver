@@ -6,10 +6,9 @@ module.exports = { createPost, getPost, getPosts, editPost };
 async function createPost(request, response, next) {
   console.log("request body", request.body);
   const feed = new Feed({
-    userId: request.body.userId,
-    fullName: request.body.userName,
+    postedBy: request.body.userId,
     postTitle: request.body.postTitle,
-    postContent: request.body.postContent
+    postContent: request.body.postContent,
   });
   feed.save().then(() => {
     response.status(200).json({
@@ -20,7 +19,7 @@ async function createPost(request, response, next) {
 }
 
 async function getPost(request, response, next) {
-  
+
   Feed.findById({ _id: request.params.id })
     .then((res) => {
       response.status(200).json({
@@ -37,15 +36,19 @@ async function getPost(request, response, next) {
 
 async function getPosts(request, response, next) {
   Feed.find()
-  .then((res) => {
-    response.status(200).json({
-      posts: res,
-      statusCode: 200,
-    });
-  })
-  .catch((error) => {
-    response.status(401).send(error);
-  });
+    .populate("postedBy")
+    .populate("comments.postedBy")
+    .exec((error, posts) => {
+      if (error) {
+        console.log("Retriveing post error",error);
+        response.status(401).send(error);
+      } else {
+        response.status(200).json({
+          posts: posts,
+          statusCode: 200,
+        });
+      }
+    })
 }
 
 async function editPost(request, response, next) {
@@ -55,7 +58,7 @@ async function editPost(request, response, next) {
     postContent: request.body.postContent
   })
 
-  User.findByIdAndUpdate({ _id: request.params.id}, updatedInfo)
+  User.findByIdAndUpdate({ _id: request.params.id }, updatedInfo)
     .then((res) => {
       response.status(200).json({
         message: "Your Post Updated Successfully!",
