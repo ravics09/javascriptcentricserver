@@ -30,7 +30,10 @@ const feedSchema = new Schema(
           type: Schema.Types.ObjectId,
           ref: "User",
         },
+        createdAt: { type : Date, default: Date.now },
+        updated_at: {type: Date, default: Date.now}
       },
+      
     ],
   },
   { timestamps: true }

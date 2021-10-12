@@ -51,18 +51,15 @@ async function getPosts(request, response, next) {
 }
 
 async function editPost(request, response, next) {
-  const updatedInfo = new Feed({
-    _id: request.params.id,
-    postTitle: request.body.postTitle,
-    postContent: request.body.postContent,
-  });
+  const updatedInfo = {
+    postTitle: request.body.updatedPostTitle,
+    postContent: request.body.updatePostContent,
+  };
 
-  User.findByIdAndUpdate({ _id: request.params.id }, updatedInfo)
+  Feed.findByIdAndUpdate(request.params.id, updatedInfo)
     .then((res) => {
       response.status(200).json({
-        message: "Your Post Updated Successfully!",
-        user: res,
-        statusCode: 200,
+        message: "Your Post Updated Successfully!"
       });
     })
     .catch((error) => {
@@ -78,6 +75,7 @@ async function createPostComment(request, response, next) {
     const newComment = {
       text: request.body.comment,
       postedBy: request.body.userId,
+      createdAt: new Date()
     };
 
     const updatedFeed = {
