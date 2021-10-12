@@ -19,10 +19,11 @@ async function createPost(request, response, next) {
 
 async function getPost(request, response, next) {
   Feed.findById({ _id: request.params.id })
+    .populate("postedBy")
+    .populate("comments.postedBy")
     .then((res) => {
       response.status(200).json({
         post: res,
-        statusCode: 200,
       });
     })
     .catch((error) => {
