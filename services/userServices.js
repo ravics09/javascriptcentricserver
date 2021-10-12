@@ -78,7 +78,6 @@ async function getUser(request, response, next) {
 async function getProfile(request, response, next) {
   const user = await User.findById(request.params.id);
   if (user) {
-    console.log("user passing",user);
     response.status(200).json({
       user: user,
       statusCode: 200,
