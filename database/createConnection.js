@@ -13,5 +13,6 @@ mongoose.connection.on('error', err => {
 module.exports = {
     User: require('../models/userModel'),
     Feed: require('../models/feedModel'),
-    Token: require('../models/tokenModel')
+    Token: require('../models/tokenModel'),
+    ContactUs: require('../models/contactUsModel'),
 };
