@@ -35,22 +35,18 @@ const userSchema = new Schema(
     },
     bio: {
       type: String,
-      unique: true,
       trim: true,
     },
     skills: {
       type: String,
-      unique: true,
       trim: true,
     },
     work: {
       type: String,
-      unique: true,
       trim: true,
     },
     education: {
       type: String,
-      unique: true,
       trim: true,
     },
     profileImage: {

@@ -79,8 +79,7 @@ async function getProfile(request, response, next) {
   const user = await User.findById(request.params.id);
   if (user) {
     response.status(200).json({
-      user: user,
-      statusCode: 200,
+      user: user
     });
   } else response.status(400).send("User Information Not Found");
 }
@@ -105,8 +104,7 @@ async function editProfile(request, response, next) {
     User.findByIdAndUpdate(request.params.id, updatedInfo).then((dbUser) => {
       response.status(200).json({
         message: "Profile updated successfully!",
-        user: dbUser,
-        statusCode: 200,
+        user: dbUser
       });
     });
   } else response.status(404).send("User Information Not Found.");
