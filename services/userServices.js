@@ -62,11 +62,9 @@ async function getUser(request, response, next) {
         );
 
         response.status(200).json({
-          message: "You have successfully signed in",
-          token: token,
+          accessToken: token,
           user: user,
-          userId: user._id.toString(),
-          statusCode: 200,
+          userId: user._id.toString()
         });
       } else {
         response.status(401).send("Invalid Credentials! Please try again.");

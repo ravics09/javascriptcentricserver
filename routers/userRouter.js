@@ -5,8 +5,8 @@ const { isAuth } = require('./../services/authServices');
 
 mainRoutes.post('/signup', signUp);
 mainRoutes.post('/signin', signIn);
-mainRoutes.get('/profile/:id', getProfile);
-mainRoutes.put('/editprofile/:id', editProfile);
+mainRoutes.get('/profile/:id', isAuth, getProfile);
+mainRoutes.put('/editprofile/:id',isAuth, editProfile);
 mainRoutes.post('/forgetpassword', forgetPassword);
 mainRoutes.get('/validateresetlink/:id/:token', validateResetLink); // Validate Reset Password Link Sent On Email Address
 mainRoutes.put('/resetpassword/:id', resetPassword);  // Is it secured or not?
