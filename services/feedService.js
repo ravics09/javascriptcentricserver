@@ -1,7 +1,15 @@
 const db = require("./../database/createConnection");
 const Feed = db.Feed;
+const User = db.User;
 
-module.exports = { createPost, getPost, getPosts, editPost, createPostComment };
+module.exports = {
+  createPost,
+  getPost,
+  getPosts,
+  editPost,
+  createPostComment,
+  getUserPosts,
+};
 
 async function createPost(request, response, next) {
   const feed = new Feed({
@@ -59,7 +67,7 @@ async function editPost(request, response, next) {
   Feed.findByIdAndUpdate(request.params.id, updatedInfo)
     .then((res) => {
       response.status(200).json({
-        message: "Your Post Updated Successfully!"
+        message: "Your Post Updated Successfully!",
       });
     })
     .catch((error) => {
@@ -75,7 +83,7 @@ async function createPostComment(request, response, next) {
     const newComment = {
       text: request.body.comment,
       postedBy: request.body.userId,
-      createdAt: new Date()
+      createdAt: new Date(),
     };
 
     const updatedFeed = {
@@ -85,8 +93,26 @@ async function createPostComment(request, response, next) {
     Feed.findByIdAndUpdate(request.params.id, updatedFeed).then((res) => {
       response.status(200).json({
         message: "Your Comment Added Successfully!",
-        statusCode: 200,
+        comments: res.comments,
       });
     });
+  }
+}
+
+async function getUserPosts(request, response, next) {
+  if (request.params.id.match(/^[0-9a-fA-F]{24}$/)) {
+    const result = await User.findById({ _id: request.params.id }).populate(
+      "Feed"
+    );
+
+    if (result) {
+      response.status(200).json({
+        posts: result,
+      });
+    } else {
+      response.status(404).send("Somthing is wrong.");
+    }
+  } else {
+    response.status(404).send("User Id is Not Valid");
   }
 }

@@ -58,10 +58,17 @@ const userSchema = new Schema(
       required: true,
     },
   },
-  { timestamps: true }
+  { timestamps: true, toJSON: {virtuals: true} }
 );
 
-userSchema.set("toJSON", {
-  virtuals: true,
-});
+// userSchema.set("toJSON", {
+//   virtuals: true,
+// });
+
+userSchema.virtual("Feed",{
+  ref: "Feed",
+  localField: "_id",
+  foreignField: "postedBy"
+})
+
 module.exports = mongoose.model("User", userSchema);

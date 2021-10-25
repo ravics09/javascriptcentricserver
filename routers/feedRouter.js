@@ -8,6 +8,8 @@ mainRoutes.get('/getpost/:id', getPost);
 mainRoutes.get('/getposts', getPosts);
 mainRoutes.put('/editpost/:id', editPost);
 mainRoutes.put('/createnewcomment/:id',createPostComment);
+mainRoutes.get('/getuserposts/:id', getUserPosts);
+
 
 function createPost(request, response, next) {
     feedService.createPost(request, response, next);
@@ -27,6 +29,10 @@ function editPost(request, response, next) {
 
 function createPostComment(request, response, next) {
     feedService.createPostComment(request, response, next);
+};
+
+function getUserPosts(request, response, next) {
+    feedService.getUserPosts(request, response, next);
 };
 
 
