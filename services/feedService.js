@@ -9,6 +9,7 @@ module.exports = {
   editPost,
   createPostComment,
   getUserPosts,
+  deletePost
 };
 
 async function createPost(request, response, next) {
@@ -60,8 +61,8 @@ async function getPosts(request, response, next) {
 
 async function editPost(request, response, next) {
   const updatedInfo = {
-    postTitle: request.body.updatedPostTitle,
-    postContent: request.body.updatePostContent,
+    postTitle: request.body.title,
+    postContent: request.body.content,
   };
 
   Feed.findByIdAndUpdate(request.params.id, updatedInfo)
@@ -115,4 +116,19 @@ async function getUserPosts(request, response, next) {
   } else {
     response.status(404).send("User Id is Not Valid");
   }
+}
+
+async function deletePost(request, response, next) {
+  Feed.findByIdAndRemove(request.params.id)
+  .then((res) => {
+    response.status(200).json({
+      message: "Your Post Deleted Successfully!",
+    });
+  })
+  .catch((error) => {
+    response.status(401).json({
+      error: error,
+    });
+  });
+  
 }
