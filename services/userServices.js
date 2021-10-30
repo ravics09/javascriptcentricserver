@@ -3,6 +3,7 @@ const nodemailer = require("nodemailer");
 const bcrypt = require("bcryptjs");
 const crypto = require("crypto");
 const jwt = require("jsonwebtoken");
+const path = require("path");
 
 const db = require("./../database/createConnection");
 
@@ -19,6 +20,7 @@ module.exports = {
   forgetPassword,
   validateResetLink,
   resetPassword,
+  UploadProfileImage,
 };
 
 async function createUser(request, response, next) {
@@ -64,7 +66,7 @@ async function getUser(request, response, next) {
         response.status(200).json({
           accessToken: token,
           user: user,
-          userId: user._id.toString()
+          userId: user._id.toString(),
         });
       } else {
         response.status(401).send("Invalid Credentials! Please try again.");
@@ -77,7 +79,7 @@ async function getProfile(request, response, next) {
   const user = await User.findById(request.params.id);
   if (user) {
     response.status(200).json({
-      user: user
+      user: user,
     });
   } else response.status(400).send("User Information Not Found");
 }
@@ -102,7 +104,7 @@ async function editProfile(request, response, next) {
     User.findByIdAndUpdate(request.params.id, updatedInfo).then((dbUser) => {
       response.status(200).json({
         message: "Profile updated successfully!",
-        user: dbUser
+        user: dbUser,
       });
     });
   } else response.status(404).send("User Information Not Found.");
@@ -195,4 +197,30 @@ async function validateResetLink(request, response, next) {
       response.status(200).send("Reset Link Is-Ok");
     } else response.status(400).send("Invalid Link Or Link Expired");
   } else response.status(404).send("User Not Found");
+}
+
+async function UploadProfileImage(request, response, next) {
+  const user = User.findById(request.params.id);
+  console.log("request file==", request.file);
+  if (user) {
+    const updatedInfo = new User({
+      _id: request.params.id,
+      profilePhoto: request.file.originalname,
+      profilePhotoPath: request.file.path,
+    });
+
+    User.findByIdAndUpdate(request.params.id, updatedInfo).then((dbUser) => {
+      // response.status(200).json({
+      //   message: "Profile Photo Uploaded Successfully!",
+      //   user: dbUser
+      // });
+      var filePath = "./public/uploads/images/music.png";
+      var resolvedPath = path.resolve(filePath);
+      console.log("resolvedPath", resolvedPath);
+
+      // return res.sendFile(resolvedPath); 
+      // response.writeHead(200, {'Content-Type': 'image/png'});
+      response.sendFile(resolvedPath, 'Base64');
+    });
+  } else response.status(404).send("User Information Not Found.");
 }

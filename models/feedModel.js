@@ -35,6 +35,9 @@ const feedSchema = new Schema(
       },
       
     ],
+    likes: {
+      type: Number
+    }
   },
   { timestamps: true }
 );

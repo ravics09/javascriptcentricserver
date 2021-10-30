@@ -49,9 +49,12 @@ const userSchema = new Schema(
       type: String,
       trim: true,
     },
-    profileImage: {
+    profilePhoto: {
+      type: String,
       data: Buffer,
-      contentType: String,
+    },
+    profilePhotoPath: {
+      type: String,
     },
     hash: {
       type: String,
@@ -60,10 +63,6 @@ const userSchema = new Schema(
   },
   { timestamps: true, toJSON: {virtuals: true} }
 );
-
-// userSchema.set("toJSON", {
-//   virtuals: true,
-// });
 
 userSchema.virtual("Feed",{
   ref: "Feed",
