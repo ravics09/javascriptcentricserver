@@ -98,7 +98,6 @@ async function editProfile(request, response, next) {
       skills: request.body.skills,
       work: request.body.work,
       education: request.body.education,
-      profileImage: request.body.profileImage,
     });
 
     User.findByIdAndUpdate(request.params.id, updatedInfo).then((dbUser) => {
@@ -200,27 +199,33 @@ async function validateResetLink(request, response, next) {
 }
 
 async function UploadProfileImage(request, response, next) {
-  const user = User.findById(request.params.id);
-  console.log("request file==", request.file);
-  if (user) {
-    const updatedInfo = new User({
-      _id: request.params.id,
-      profilePhoto: request.file.originalname,
-      profilePhotoPath: request.file.path,
-    });
+  const { id } = request.params;
+  var profilePic = request.file.path;
+  User.findById(id, (err, data)=>{
+    data.profilePhoto = profilePic ? profilePic : data.profilePhoto;
+    data.save().then(doc=>{
+      response.status(200).json({
+        results: doc
+      })
+    })
+    .catch(err=>{
+      response.json(err);
+    })
+  })
+  // const user = User.findById(id);
+  // if (user) {
+  //   const updatedInfo = new User({
+  //     _id: id,
+  //     profilePhoto: request.file.filename,
+  //     profilePhotoPath: request.file.path,
+  //   });
 
-    User.findByIdAndUpdate(request.params.id, updatedInfo).then((dbUser) => {
-      // response.status(200).json({
-      //   message: "Profile Photo Uploaded Successfully!",
-      //   user: dbUser
-      // });
-      var filePath = "./public/uploads/images/music.png";
-      var resolvedPath = path.resolve(filePath);
-      console.log("resolvedPath", resolvedPath);
+  //   User.findByIdAndUpdate(id, updatedInfo).then((dbUser) => {
+  //     var filePath = dbUser.profilePhotoPath;
+  //     var resolvedPath = path.resolve(filePath);
+  //     console.log("resolvedPath", resolvedPath);
 
-      // return res.sendFile(resolvedPath); 
-      // response.writeHead(200, {'Content-Type': 'image/png'});
-      response.sendFile(resolvedPath, 'Base64');
-    });
-  } else response.status(404).send("User Information Not Found.");
+  //     response.status(200).sendFile(resolvedPath);
+  //   });
+  // } else response.status(404).send("User Information Not Found.");
 }

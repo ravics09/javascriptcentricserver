@@ -51,7 +51,6 @@ const userSchema = new Schema(
     },
     profilePhoto: {
       type: String,
-      data: Buffer,
     },
     profilePhotoPath: {
       type: String,

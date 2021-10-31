@@ -9,15 +9,17 @@ module.exports = {
   editPost,
   createPostComment,
   getUserPosts,
-  deletePost
+  deletePost,
 };
 
 async function createPost(request, response, next) {
+  const { userId, postTitle, postContent } = request.body;
   const feed = new Feed({
-    postedBy: request.body.userId,
-    postTitle: request.body.postTitle,
-    postContent: request.body.postContent,
+    postedBy: userId,
+    postTitle: postTitle,
+    postContent: postContent,
   });
+
   feed.save().then(() => {
     response.status(200).json({
       message: "You have created a new post",
@@ -27,7 +29,8 @@ async function createPost(request, response, next) {
 }
 
 async function getPost(request, response, next) {
-  Feed.findById({ _id: request.params.id })
+  const { id } = request.params;
+  Feed.findById({ _id: id })
     .populate("postedBy")
     .populate("comments.postedBy")
     .then((res) => {
@@ -60,9 +63,10 @@ async function getPosts(request, response, next) {
 }
 
 async function editPost(request, response, next) {
+  const { title, content } = request.body;
   const updatedInfo = {
-    postTitle: request.body.title,
-    postContent: request.body.content,
+    postTitle: title,
+    postContent: content,
   };
 
   Feed.findByIdAndUpdate(request.params.id, updatedInfo)
@@ -79,11 +83,14 @@ async function editPost(request, response, next) {
 }
 
 async function createPostComment(request, response, next) {
-  const feed = Feed.findById(request.params.id);
+  const { comment, userId } = request.body;
+  const { id } = request.params;
+
+  const feed = Feed.findById(id);
   if (feed) {
     const newComment = {
-      text: request.body.comment,
-      postedBy: request.body.userId,
+      text: comment,
+      postedBy: userId,
       createdAt: new Date(),
     };
 
@@ -101,8 +108,9 @@ async function createPostComment(request, response, next) {
 }
 
 async function getUserPosts(request, response, next) {
-  if (request.params.id.match(/^[0-9a-fA-F]{24}$/)) {
-    const result = await User.findById({ _id: request.params.id }).populate(
+  const { id } = request.params;
+  if (id.match(/^[0-9a-fA-F]{24}$/)) {
+    const result = await User.findById({ _id: id }).populate(
       "Feed"
     );
 
@@ -119,16 +127,16 @@ async function getUserPosts(request, response, next) {
 }
 
 async function deletePost(request, response, next) {
-  Feed.findByIdAndRemove(request.params.id)
-  .then((res) => {
-    response.status(200).json({
-      message: "Your Post Deleted Successfully!",
+  const { id } = request.params;
+  Feed.findByIdAndRemove(id)
+    .then((res) => {
+      response.status(200).json({
+        message: "Your Post Deleted Successfully!",
+      });
+    })
+    .catch((error) => {
+      response.status(401).json({
+        error: error,
+      });
     });
-  })
-  .catch((error) => {
-    response.status(401).json({
-      error: error,
-    });
-  });
-  
 }

@@ -35,8 +35,13 @@ const feedSchema = new Schema(
       },
       
     ],
-    likes: {
-      type: Number
+    likeCount: {
+      type: Number,
+      default: 0
+    },
+    commentCount: {
+      type: Number,
+      default: 0
     }
   },
   { timestamps: true }
