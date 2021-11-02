@@ -52,21 +52,23 @@ const userSchema = new Schema(
     profilePhoto: {
       type: String,
     },
-    profilePhotoPath: {
-      type: String,
-    },
+    readingList: [
+      {
+        postId: String,
+      }
+    ],
     hash: {
       type: String,
       required: true,
     },
   },
-  { timestamps: true, toJSON: {virtuals: true} }
+  { timestamps: true, toJSON: { virtuals: true } }
 );
 
-userSchema.virtual("Feed",{
+userSchema.virtual("Feed", {
   ref: "Feed",
   localField: "_id",
-  foreignField: "postedBy"
-})
+  foreignField: "postedBy",
+});
 
 module.exports = mongoose.model("User", userSchema);

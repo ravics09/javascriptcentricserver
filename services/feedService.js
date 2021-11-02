@@ -28,7 +28,7 @@ async function createPost(request, response, next) {
   });
 }
 
-async function getPost(request, response, next) {
+async function getPost(request, response, next) { // TODO: to be corrected if id not exist or if post deleted.
   const { id } = request.params;
   Feed.findById({ _id: id })
     .populate("postedBy")
@@ -98,7 +98,7 @@ async function createPostComment(request, response, next) {
       $push: { comments: newComment },
     };
 
-    Feed.findByIdAndUpdate(request.params.id, updatedFeed).then((res) => {
+    Feed.findByIdAndUpdate(id, updatedFeed).then((res) => {
       response.status(200).json({
         message: "Your Comment Added Successfully!",
         comments: res.comments,

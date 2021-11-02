@@ -13,7 +13,7 @@ const isAuth = (request, response, next) => {
         next();
       }
     });
-  } else response.status(401).send("Not Authenticated");
+  } else response.status(401).send("Authentication Required! Please SignIn!!");
 };
 
 module.exports = { isAuth };

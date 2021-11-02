@@ -3,7 +3,6 @@ const nodemailer = require("nodemailer");
 const bcrypt = require("bcryptjs");
 const crypto = require("crypto");
 const jwt = require("jsonwebtoken");
-const path = require("path");
 
 const db = require("./../database/createConnection");
 
@@ -21,6 +20,9 @@ module.exports = {
   validateResetLink,
   resetPassword,
   UploadProfileImage,
+  addToReadingList,
+  removeFromReadingList,
+  fetchReadingList,
 };
 
 async function createUser(request, response, next) {
@@ -76,7 +78,8 @@ async function getUser(request, response, next) {
 }
 
 async function getProfile(request, response, next) {
-  const user = await User.findById(request.params.id);
+  const { id } = request.params;
+  const user = await User.findById(id);
   if (user) {
     response.status(200).json({
       user: user,
@@ -228,4 +231,64 @@ async function UploadProfileImage(request, response, next) {
   //     response.status(200).sendFile(resolvedPath);
   //   });
   // } else response.status(404).send("User Information Not Found.");
+}
+
+async function addToReadingList(request, response) {
+  const { id } = request.params;
+  const { postId } = request.body;
+
+  const user = await User.findById(id);
+  if (user) {
+
+    const newItem = {
+      postId: postId,
+    };
+
+    const updateReadingList = {
+      $push: {readingList: newItem}
+    }
+
+    User.findByIdAndUpdate(id, updateReadingList).then((res) => {
+      response.status(200).json({
+        message: "New Article Added To Reading List!",
+        readingList: res.readingList,
+      });
+    });
+  }
+}
+
+async function removeFromReadingList(request, response) {
+  const { id } = request.params;
+  const { postId } = request.body;
+
+  const user = await User.findById(id);
+  if (user) {
+
+    const newItem = {
+      postId: postId,
+    };
+
+    const updateReadingList = {
+      $push: {readingList: newItem}
+    }
+
+    User.findByIdAndUpdate(id, updateReadingList).then((res) => {
+      response.status(200).json({
+        message: "New Article Added To Reading List!",
+        readingList: res.readingList,
+      });
+    });
+  }
+}
+
+async function fetchReadingList(request, response){
+  const { id } = request.params;
+  const user  = await User.findById(id);
+  if (user) {
+    response.status(200).json({
+      readingList: user.readingList
+    });
+  } else {
+    response.status(404).send("Somthing is wrong.");
+  }
 }
