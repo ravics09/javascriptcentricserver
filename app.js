@@ -1,11 +1,11 @@
 const express = require("express");
 const app = express();
-require('./util/initRadis');
-
+// require('./util/initRadis');
 const path = require("path");
 const helmet = require("helmet");
 const cors = require("cors");
 const morgan = require("morgan");
+
 
 app.get("/test",(req, res) => {
   res.send("Testing success");
