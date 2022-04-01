@@ -11,7 +11,7 @@ const feedSchema = new Schema(
       type: String,
       trim: true,
       minLength: [10, "title is too short!"],
-      maxLength: 50,
+      maxLength: 100,
     },
     postContent: {
       type: String,
