@@ -7,8 +7,8 @@ const cors = require("cors");
 const morgan = require("morgan");
 
 
-app.get("/test",(req, res) => {
-  res.send("Testing success");
+app.get("/message",(req, res) => {
+  res.send("Test route for testing apis endpoint");
 })
 
 // Use Middlewares in our app.
@@ -43,3 +43,6 @@ const port =
 app.listen(port, () => {
   console.log("JavaScript Centric Server running on port " + port);
 });
+
+
+module.exports = app;

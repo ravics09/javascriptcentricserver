@@ -1,6 +1,6 @@
 
 ###
-GET http://localhost:9090
+GET http://localhost:9090/test
 
 ###
 POST http://localhost:9090/auth/signup/ HTTP/1.1
@@ -27,6 +27,6 @@ GET HTTP://localhost:9090/user
 ###
 GET HTTP://localhost:9090/user/profile/624540ca4ac88651a691f99e HTTP/1.1
 content-type: application/json
-Authorization: jwt eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InJhdmlzaGFybWFjczA5QGdtYWlsLmNvbSIsImlhdCI6MTY0ODc0MTEzMywiZXhwIjoxNjQ4ODI3NTMzfQ.9w9mGSALjMRxIS014hh0lugorOMq7qjH1rBUxxQOrpo
+# Authorization: jwt eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InJhdmlzaGFybWFjczA5QGdtYWlsLmNvbSIsImlhdCI6MTY0ODc0MTEzMywiZXhwIjoxNjQ4ODI3NTMzfQ.9w9mGSALjMRxIS014hh0lugorOMq7qjH1rBUxxQOrpo
 
 
