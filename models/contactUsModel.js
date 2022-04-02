@@ -1,5 +1,6 @@
-const mongoose = require("mongoose");
-const Schema = mongoose.Schema;
+// const mongoose = require("mongoose");
+// const Schema = mongoose.Schema;
+const { Schema, model} = require("mongoose");
 
 const contactUsSchema = new Schema(
   {
@@ -35,4 +36,4 @@ const contactUsSchema = new Schema(
 contactUsSchema.set("toJSON", {
   virtuals: true,
 });
-module.exports = mongoose.model("ContactUs", contactUsSchema);
+module.exports = model("ContactUs", contactUsSchema);
