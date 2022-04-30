@@ -1,7 +1,6 @@
 const express = require('express');
 const mainRoutes = express.Router();
-const feedService = require('./../services/feedService');
-const { isAuth } = require('./../services/authServices');
+const feedController = require('./../controllers/feedController');
 
 mainRoutes.post('/createpost', createPost);
 mainRoutes.get('/getpost/:id', getPost);
@@ -13,31 +12,31 @@ mainRoutes.delete('/deletepost/:id', deletePost);
 
 
 function createPost(request, response, next) {
-    feedService.createPost(request, response, next);
+    feedController.createPost(request, response, next);
 };
 
 function getPost(request, response, next) {
-    feedService.getPost(request, response, next);
+    feedController.getPost(request, response, next);
 };
 
 function getPosts(request, response, next) {
-    feedService.getPosts(request, response, next);
+    feedController.getPosts(request, response, next);
 };
 
 function editPost(request, response, next) {
-    feedService.editPost(request, response, next);
+    feedController.editPost(request, response, next);
 };
 
 function createPostComment(request, response, next) {
-    feedService.createPostComment(request, response, next);
+    feedController.createPostComment(request, response, next);
 };
 
 function getUserPosts(request, response, next) {
-    feedService.getUserPosts(request, response, next);
+    feedController.getUserPosts(request, response, next);
 };
 
 function deletePost(request, response, next) {
-    feedService.deletePost(request, response, next);
+    feedController.deletePost(request, response, next);
 };
 
 

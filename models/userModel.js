@@ -1,30 +1,19 @@
-// const mongoose = require("mongoose");
-// const Schema = mongoose.Schema;
 const { Schema, model} = require("mongoose");
 const userSchema = new Schema(
   {
     fullName: {
       type: String,
-      required: true,
       trim: true,
     },
     email: {
       type: String,
       unique: true,
-      required: true,
-      trim: true,
       index: true,
-    },
-    userName: {
-      type: String,
-      unique: true,
-      trim: true,
-      minLength: [4, "username is too short!"],
-      maxLength: 15,
+      required: true,
+      trim: true
     },
     mobile: {
       type: Number,
-      unique: true,
       trim: true,
       minLength: 10,
       maxLength: 10,
@@ -71,5 +60,4 @@ userSchema.virtual("Feed", {
   foreignField: "postedBy",
 });
 
-// module.exports = mongoose.model("User", userSchema);
 module.exports = model("User", userSchema);

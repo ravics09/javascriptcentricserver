@@ -1,37 +1,46 @@
-const express = require('express');
+const express = require("express");
 const authRoutes = express.Router();
-const authServices = require('./../services/authServices');
-const { isAuth } = require('./../middleware/isAuth');
-const {signInLimiter} = require('./../middleware/rateLimiter');
+
+const { isAuth } = require("./../middleware/isAuth");
+const { signInLimiter } = require("./../middleware/rateLimiter");
+const authController = require("./../controllers/authController");
 
 // Auth Middleware used to validate jwt token for each request.
 // authRoutes.use('*', isAuth);
-// authRoutes.use(RateLimiter);
 
-authRoutes.post('/signup', signInLimiter, signUp);
-authRoutes.post('/signin', signInLimiter, signIn);
-authRoutes.post('/forgetpassword', signInLimiter, forgetPassword);
-authRoutes.get('/validateresetlink/:id/:token', signInLimiter, validateResetLink); // Validate Reset Password Link Sent On Email Address
-authRoutes.put('/resetpassword/:id', signInLimiter, resetPassword);  // Is it secured or not?
+authRoutes.post("/signup", signUp);
+authRoutes.post("/signin", signIn);
+authRoutes.post("/googlesignin", googleSignIn);
+authRoutes.post("/forgetpassword", signInLimiter, forgetPassword);
+authRoutes.get(
+  "/validateresetlink/:id/:token",
+  signInLimiter,
+  validateResetLink
+);
+authRoutes.put("/resetpassword/:id", signInLimiter, resetPassword); // Is it secured or not?
 
-function signUp(request, response, next) {
-    authServices.signUpUser(request.body, response, next);
-};
+function signUp(request, response) {
+  authController.signUpUser(request, response);
+}
 
-function signIn(request, response, next) {
-    authServices.signInUser(request.body, response, next);
-};
+function signIn(request, response) {
+  authController.signInUser(request, response);
+}
 
-function forgetPassword(request, response, next) {
-    authServices.forgetPassword(request, response, next);
-};
+function googleSignIn(request, response) {
+  authController.googleSignInUser(request, response);
+}
 
-function validateResetLink(request, response, next) {
-    authServices.validateResetLink(request, response, next);
-};
+function forgetPassword(request, response) {
+  authController.forgetPassword(request, response);
+}
 
-function resetPassword(request, response, next) {
-    authServices.resetPassword(request, response, next);
-};
+function validateResetLink(request, response) {
+  authController.validateResetLink(request, response);
+}
+
+function resetPassword(request, response) {
+  authController.resetPassword(request, response);
+}
 
 module.exports = authRoutes;

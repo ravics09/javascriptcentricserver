@@ -1,5 +1,4 @@
-const db = require("./../database/createConnection");
-const ContactUs = db.ContactUs;
+const ContactUs = require("./../models/contactUsModel");
 
 module.exports = { sendMessage, getMessage, getMessages };
 

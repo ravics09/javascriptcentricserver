@@ -1,16 +1,5 @@
-const db = require("./../database/createConnection");
-const Feed = db.Feed;
-const User = db.User;
-
-module.exports = {
-  createPost,
-  getPost,
-  getPosts,
-  editPost,
-  createPostComment,
-  getUserPosts,
-  deletePost,
-};
+const User  = require("./../models/userModel");
+const Feed  = require("./../models/feedModel");
 
 async function createPost(request, response, next) {
   const { userId, postTitle, postContent } = request.body;
@@ -140,3 +129,13 @@ async function deletePost(request, response, next) {
       });
     });
 }
+
+module.exports = {
+  createPost,
+  getPost,
+  getPosts,
+  editPost,
+  createPostComment,
+  getUserPosts,
+  deletePost,
+};
