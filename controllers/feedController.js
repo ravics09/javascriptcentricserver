@@ -1,7 +1,7 @@
-const User  = require("./../models/userModel");
-const Feed  = require("./../models/feedModel");
+const User = require("./../models/userModel");
+const Feed = require("./../models/feedModel");
 
-async function createPost(request, response, next) {
+async function createPost(request, response) {
   const { userId, postTitle, postContent } = request.body;
   const feed = new Feed({
     postedBy: userId,
@@ -11,13 +11,12 @@ async function createPost(request, response, next) {
 
   feed.save().then(() => {
     response.status(200).json({
-      message: "You have created a new post",
-      statusCode: 200,
+      message: "Your Post Submitted Successfully",
     });
   });
 }
 
-async function getPost(request, response, next) { // TODO: to be corrected if id not exist or if post deleted.
+async function getPost(request, response) {
   const { id } = request.params;
   Feed.findById({ _id: id })
     .populate("postedBy")
@@ -34,13 +33,11 @@ async function getPost(request, response, next) { // TODO: to be corrected if id
     });
 }
 
-async function getPosts(request, response, next) {
-  Feed.find({})
-    .populate("postedBy")
-    .populate("comments.postedBy")
+async function getPosts(request, response) {
+  Feed.find({}).select(["postedBy", "postTitle", "likeCount", "commentCount","createdAt"])
+    .populate("postedBy", ["fullName","email" ,"profilePhoto"])
     .exec((error, posts) => {
       if (error) {
-        console.log("Retriveing post error", error);
         response.status(401).send(error);
       } else {
         response.status(200).json({
@@ -51,7 +48,7 @@ async function getPosts(request, response, next) {
     });
 }
 
-async function editPost(request, response, next) {
+async function editPost(request, response) {
   const { title, content } = request.body;
   const updatedInfo = {
     postTitle: title,
@@ -71,7 +68,7 @@ async function editPost(request, response, next) {
     });
 }
 
-async function createPostComment(request, response, next) {
+async function createPostComment(request, response) {
   const { comment, userId } = request.body;
   const { id } = request.params;
 
@@ -96,12 +93,10 @@ async function createPostComment(request, response, next) {
   }
 }
 
-async function getUserPosts(request, response, next) {
+async function getUserPosts(request, response) {
   const { id } = request.params;
   if (id.match(/^[0-9a-fA-F]{24}$/)) {
-    const result = await User.findById({ _id: id }).populate(
-      "Feed"
-    );
+    const result = await User.findById({ _id: id }).populate("Feed");
 
     if (result) {
       response.status(200).json({
@@ -115,7 +110,7 @@ async function getUserPosts(request, response, next) {
   }
 }
 
-async function deletePost(request, response, next) {
+async function deletePost(request, response) {
   const { id } = request.params;
   Feed.findByIdAndRemove(id)
     .then((res) => {

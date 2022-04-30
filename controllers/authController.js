@@ -27,8 +27,7 @@ async function signUpUser(request, response) {
             hash: passwordHash,
           }).then(() => {
             response.status(200).json({
-              message: "You have signed up successfully. Please sign in!!",
-              statusCode: 200,
+              message: "You have signed up successfully. Please sign in!!"
             });
           });
         }
@@ -39,6 +38,7 @@ async function signUpUser(request, response) {
 }
 
 async function signInUser(request, response) {
+  console.log("sign user data", request.body);
   const { email, password } = request.body;
   const user = await User.findOne({ email: email });
 
@@ -187,8 +187,7 @@ async function forgetPassword(request, response) {
           response.status(500).send("Error While Sending Password Reset Link");
         } else {
           response.status(200).json({
-            message: `Recovery email link sent on ${user.email}`,
-            statusCode: 200,
+            message: `Recovery email link sent on ${user.email}`
           });
         }
       });

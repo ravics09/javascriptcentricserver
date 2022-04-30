@@ -16,7 +16,7 @@ const feedSchema = new Schema(
       type: String,
       trim: true,
       minLength: [4, "postContent is too short!"],
-      maxLength: 1500,
+      maxLength: 5000,
     },
     topicCover: {
       data: Buffer,
