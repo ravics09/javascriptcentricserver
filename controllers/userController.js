@@ -75,7 +75,6 @@ async function editProfile(request, response) {
       _id: request.params.id,
       fullName: request.body.fullName,
       email: request.body.email,
-      userName: request.body.userName,
       mobile: request.body.mobile,
       location: request.body.location,
       bio: request.body.bio,
@@ -103,6 +102,7 @@ async function UploadProfileImage(request, response) {
       .then((doc) => {
         response.status(200).json({
           results: doc,
+          message: "Your photo uploaded successfully",
         });
       })
       .catch((err) => {

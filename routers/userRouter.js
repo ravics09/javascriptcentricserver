@@ -8,19 +8,20 @@ const userController = require("./../controllers/userController");
 
 
 // Middleware that is specific to this route
-mainRoutes.use("*", isAuth);
+// mainRoutes.use("*", isAuth);
 mainRoutes.use(apiLimiter);
 
 mainRoutes.get("/profile/:id", getProfile);
 mainRoutes.put("/editprofile/:id", editProfile);
 mainRoutes.put(
   "/uploadprofileimage/:id",
-  [isAuth, Upload.single("profilePhoto")],
+  // [isAuth, Upload.single("profilePhoto")],
+  Upload.single("profilePhoto"),
   UploadProfileImage
 );
-mainRoutes.put("/addtoreadinglist/:id", isAuth, addToReadingList);
-mainRoutes.put("/removefromreadinglist/:id", isAuth, removeFromReadingList);
-mainRoutes.get("/fetchReadingList/:id", isAuth, fetchReadingList);
+mainRoutes.put("/addtoreadinglist/:id", addToReadingList);
+mainRoutes.put("/removefromreadinglist/:id", removeFromReadingList);
+mainRoutes.get("/fetchReadingList/:id", fetchReadingList);
 
 function getProfile(request, response, next) {
   userController.getProfile(request, response, next);
