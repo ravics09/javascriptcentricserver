@@ -30,15 +30,15 @@ module.exports = {
 };
 
 async function getProfile(request, response) {
+  console.log("getProfile called");
   const { id } = request.params;
   const profile = await client.get(id);
-  
+
   if (profile) {
     response.status(200).json({
       user: JSON.parse(profile),
     });
   } else {
-
     const user = await User.findById(id);
     if (user) {
       const customResponse = {

@@ -38,7 +38,6 @@ async function signUpUser(request, response) {
 }
 
 async function signInUser(request, response) {
-  console.log("sign user data", request.body);
   const { email, password } = request.body;
   const user = await User.findOne({ email: email });
 

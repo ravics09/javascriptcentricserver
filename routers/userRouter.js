@@ -8,7 +8,7 @@ const userController = require("./../controllers/userController");
 
 
 // Middleware that is specific to this route
-// mainRoutes.use("*", isAuth);
+mainRoutes.use("*", isAuth);
 mainRoutes.use(apiLimiter);
 
 mainRoutes.get("/profile/:id", getProfile);
