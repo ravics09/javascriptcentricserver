@@ -11,7 +11,7 @@ const User = require("./../models/userModel");
 const Token = require("./../models/tokenModel");
 
 async function signUpUser(request, response) {
-  console.log("User details for sign up",request.body);
+  console.log("User details for sign up", request.body);
   const { email, fullName, password } = request.body;
   const user = await User.findOne({ email: email });
 
@@ -27,7 +27,7 @@ async function signUpUser(request, response) {
             hash: passwordHash,
           }).then(() => {
             response.status(200).json({
-              message: "You have signed up successfully. Please sign in!!"
+              message: "You have signed up successfully. Please sign in!!",
             });
           });
         }
@@ -48,6 +48,10 @@ async function signInUser(request, response) {
       status: 404,
     });
   } else {
+    let profilePic = user.profilePhoto
+      ? "http://localhost:9090" + user.profilePhoto.replace("public", "")
+      : null;
+
     const customResponse = {
       _id: user._id,
       fullName: user.fullName,
@@ -59,7 +63,7 @@ async function signInUser(request, response) {
       skills: user.skills,
       work: user.work,
       education: user.education,
-      profilePhoto: user.profilePhoto,
+      profilePhoto: profilePic,
     };
     bcrypt.compare(password, user.hash, (err, compareRes) => {
       if (err) {
@@ -149,7 +153,9 @@ async function forgetPassword(request, response) {
 
   const user = await User.findOne({ email: email });
   if (!user) {
-    response.status(403).send("User Not Registered With This Email");
+    response.status(403).json({
+      message: `User Not Registered With This Email`,
+    });
   } else {
     let token = await Token.findOne({ userId: user._id });
     if (!token) {
@@ -184,10 +190,12 @@ async function forgetPassword(request, response) {
 
       transporter.sendMail(mailOptions, (error, res) => {
         if (error) {
-          response.status(500).send("Error While Sending Password Reset Link");
+          response.status(500).json({
+            message: `Error While Sending Password Reset Link`,
+          });
         } else {
           response.status(200).json({
-            message: `Recovery email link sent on ${user.email}`
+            message: `Password reset link sent to your registered email address ${user.email}`,
           });
         }
       });
